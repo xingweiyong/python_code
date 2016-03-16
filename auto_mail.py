@@ -2,7 +2,7 @@
 import smtplib
 import string
 
-HOST='qq.163.com'
+HOST='smtp.qq.com'
 SUBJECT='test email from python'
 TO='1531694185@qq.com'
 FROM='441078355@qq.com'
@@ -17,6 +17,6 @@ BODY=string.join((
 server=smtplib.SMTP()
 server.connect(HOST,'25')
 server.starttls()
-server.login('441078355@qq.com','bedmayrwrohfbhbe')
+server.login('441078355@qq.com','bedmayrwrohfbhbe')#发送邮箱需开通 smtp服务设置
 server.sendmail(FROM,TO,BODY)
 server.quit()
