@@ -35,6 +35,7 @@ for item in temp:
 print chardet.detect(result_str)
 f=file('result1.txt','w')
 #f.write(str(result_str.encode('utf-8')))
+#f.write(temp[0].encode('utf-8'))
 f.write(result_str.encode('utf-8','ignore'))
 f.close()
 #print chardet.detect(result_str.decode('ascii').encode('utf-8'))
