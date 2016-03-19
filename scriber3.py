@@ -24,7 +24,13 @@ def get_web(web_url):
                 if tag.td.p.span.string != None:
                     temp.append(tit)
                     zone=tag.td.p.span.string+" "
-                    temp.append(zone)
+                    if zone==u'成交套数（套） ':
+                        del zone
+                    else:
+                        temp.append(zone)
+                else:
+                    temp.append(tit)
+                    temp.append(u'蓟县'+' ')
                 item=tag.select('span[lang="EN-US"]')
                 num_item=len(item)
                 if num_item >11:
@@ -37,8 +43,9 @@ def get_web(web_url):
                     print get_sub(str(tag.td.p.span.font))
                 else:
                     print get_sub(str(tag.td.p.span))
-    for item in temp:
-        print item
+    #for item in temp:
+    if temp[1]==tit:
+        del temp[0]
     try:
         result_f=file('result3.txt','a')
         for item in temp:
@@ -46,7 +53,7 @@ def get_web(web_url):
     finally:
         result_f.close()
 if __name__=='__main__':
-    for i in [3,1000,2000]:#[3,1000,2000,3000,3015]
+    for i in [2,3,1000,2000]:#[3,1000,2000,3000,3015]
         url='http://www2.tjfdc.gov.cn/Lists/List51/DispForm1.aspx?ID='+ str(i)
         print url
         get_web(url)
