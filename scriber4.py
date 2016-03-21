@@ -18,7 +18,7 @@ def check_error(web_url):
             soup=BeautifulSoup(response)
             return True
         except Exception,e:
-            print e+" occurred"
+            print e
             return False
 
 def get_web(web_url):
