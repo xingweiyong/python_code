@@ -54,7 +54,7 @@ def get_web(web_url):
                         if item[i].string != None:
                             if item[i].string !=u'(':
                                 temp.append(item[i].string+' ')
-                    temp.append('\r\n')
+                    temp.append('\n')
             if tag['style']=='height:15.75pt':#网页样式改变
                 temp.append(tit)
                 if tag.td.p.span.font!=None:
@@ -67,7 +67,7 @@ def get_web(web_url):
                         for i in range(0,num_item1):
                             if item[i].string!=None:
                                 temp.append(item[i].string+' ')
-                        temp.append('\r\n')
+                        temp.append('\n')
                 else:
                     #print get_sub(str(tag.td.p.span))
                     temp.append(get_sub(str(tag.td.p.span))+' ')
@@ -77,7 +77,7 @@ def get_web(web_url):
                         for i in range(0,num_item1):
                             if item[i].string!=None:
                                 temp.append(item[i].string+' ')
-                        temp.append('\r\n')
+                        temp.append('\n')
     try:
         result_f=file('result3.txt','a')
         if len(temp)!=0:
@@ -86,11 +86,13 @@ def get_web(web_url):
             if temp[1]==u'(':
                 del temp[0:2]
         for item in temp:
+            if item==u'蓟 ':
+                item=u'蓟县'
             save_as(item.encode('utf-8'), result_f)
     finally:
         result_f.close()
 if __name__=='__main__':
-    for i in range(2,3076):#[3,1000,2000,3000,3015]
+    for i in range(2,3079):#[3,1000,2000,3000,3015]
         url='http://www2.tjfdc.gov.cn/Lists/List51/DispForm1.aspx?ID='+ str(i)
         print url
         if check_error(url):
