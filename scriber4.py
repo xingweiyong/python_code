@@ -25,7 +25,9 @@ def get_web(web_url):
                     temp.append(tit)
                     for i in tag.td.p.span.span.stripped_strings:
                         if i !=u'县':
-                            temp.append(i)
+                            temp.append(i+' ')
+                    if temp[0]!=tit+u'和平区 ':
+                        temp.insert(0,tit+u'和平区 ')
                 item=tag.select('span[lang="EN-US"]')
                 num_item=len(item)
                 if num_item >11:
@@ -48,7 +50,7 @@ def get_web(web_url):
     finally:
         result_f.close()
 if __name__=='__main__':
-    for i in [2,3,1000,2000]:#[3,1000,2000,3000,3015]
+    for i in [3000,3015]:#[3,1000,2000,3000,3015]
         url='http://www2.tjfdc.gov.cn/Lists/List51/DispForm1.aspx?ID='+ str(i)
         print url
         get_web(url)
