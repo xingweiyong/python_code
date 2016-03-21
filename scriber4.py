@@ -11,6 +11,15 @@ def get_sub(str):
     return str[num1+2:num2]
 def save_as(str,f):
     f.write(str)
+def check_error(web_url):
+        try:
+            request=urllib2.Request(web_url)
+            response=urllib2.urlopen(request)
+            soup=BeautifulSoup(response)
+            return True
+        except Exception,e:
+            print e+" occurred"
+            return False
 
 def get_web(web_url):
     request=urllib2.Request(web_url)
@@ -41,7 +50,7 @@ def get_web(web_url):
             if tag['style']=='height:15.75pt':
                 temp.append(tit)
                 if tag.td.p.span.font!=None:
-                    print get_sub(str(tag.td.p.span.font))
+                    #print get_sub(str(tag.td.p.span.font))
                     temp.append(get_sub(str(tag.td.p.span.font))+' ')
                     item=tag.select('span[lang="EN-US"]')
                     num_item1=len(item)
@@ -52,7 +61,7 @@ def get_web(web_url):
                                 temp.append(item[i].string+' ')
                         temp.append('\r\n')
                 else:
-                    print get_sub(str(tag.td.p.span))
+                    #print get_sub(str(tag.td.p.span))
                     temp.append(get_sub(str(tag.td.p.span))+' ')
                     item=tag.select('span[lang="EN-US"]')
                     num_item1=len(item)
@@ -68,7 +77,10 @@ def get_web(web_url):
     finally:
         result_f.close()
 if __name__=='__main__':
-    for i in [3,1000,2000,3000,3015]:#[3,1000,2000,3000,3015]
+    for i in [3010,3014,3074,3052]:#[3,1000,2000,3000,3015]
         url='http://www2.tjfdc.gov.cn/Lists/List51/DispForm1.aspx?ID='+ str(i)
         print url
-        get_web(url)
+        if check_error(url):
+            get_web(url)
+        else:
+            continue
