@@ -2,6 +2,7 @@
 import urllib2
 from bs4 import BeautifulSoup
 import sys
+import random,time
 reload(sys)
 sys.setdefaultencoding('utf-8')
 #获取字段函数
@@ -79,7 +80,7 @@ def get_web(web_url):
                                 temp.append(item[i].string+' ')
                         temp.append('\n')
     try:
-        result_f=file('result3.txt','a')
+        result_f=file('result1.txt','a')
         if len(temp)!=0:
             if temp[1]==tit:
                 del temp[0]
@@ -92,9 +93,10 @@ def get_web(web_url):
     finally:
         result_f.close()
 if __name__=='__main__':
-    for i in range(2,3079):#[3,1000,2000,3000,3015]
+    for i in range(201,3079):#[3,1000,2000,3000,3015]
         url='http://www2.tjfdc.gov.cn/Lists/List51/DispForm1.aspx?ID='+ str(i)
         print url
+        time.sleep(random.randint(1,4))
         if check_error(url):
             get_web(url)
         else:
