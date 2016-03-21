@@ -1,6 +1,9 @@
 #coding:utf-8
 import urllib2
 from bs4 import BeautifulSoup
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 def get_sub(str):
     num2=int(str.find('<',2))
@@ -36,13 +39,28 @@ def get_web(web_url):
                             temp.append(item[i].string+' ')
                     temp.append('\r\n')
             if tag['style']=='height:15.75pt':
+                temp.append(tit)
                 if tag.td.p.span.font!=None:
                     print get_sub(str(tag.td.p.span.font))
+                    temp.append(get_sub(str(tag.td.p.span.font))+' ')
+                    item=tag.select('span[lang="EN-US"]')
+                    num_item1=len(item)
+                    #print num_item1
+                    if num_item1>11:
+                        for i in range(0,num_item1):
+                            if item[i].string!=None:
+                                temp.append(item[i].string+' ')
+                        temp.append('\r\n')
                 else:
                     print get_sub(str(tag.td.p.span))
-    #for item in temp:
-    if temp[1]==tit:
-        del temp[0]
+                    temp.append(get_sub(str(tag.td.p.span))+' ')
+                    item=tag.select('span[lang="EN-US"]')
+                    num_item1=len(item)
+                    if num_item1>11:
+                        for i in range(0,num_item1):
+                            if item[i].string!=None:
+                                temp.append(item[i].string+' ')
+                        temp.append('\r\n')
     try:
         result_f=file('result3.txt','a')
         for item in temp:
@@ -50,7 +68,7 @@ def get_web(web_url):
     finally:
         result_f.close()
 if __name__=='__main__':
-    for i in [3000,3015]:#[3,1000,2000,3000,3015]
+    for i in [3,1000,2000,3000,3015]:#[3,1000,2000,3000,3015]
         url='http://www2.tjfdc.gov.cn/Lists/List51/DispForm1.aspx?ID='+ str(i)
         print url
         get_web(url)
