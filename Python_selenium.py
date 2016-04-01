@@ -27,4 +27,22 @@ browser.get('http://club.autohome.com.cn/bbs/forum-a-100002-1.html')
 
 for item in browser.find_elements_by_class_name('tcount'):#获取评论数
     print item.text
+    
+'''
+#浏览器自动搜索
+import time
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 
+browser = webdriver.Firefox()
+browser.get('http://www.baidu.com')
+#print browser.title# 网页title内容
+assert u"百度一下" in browser.title#判断标题里是否有assert的文本
+elem = browser.find_element_by_id("kw")
+elem.send_keys("selenium")
+elem.send_keys(Keys.RETURN)
+
+browser.maximize_window()
+time.sleep(5)
+browser.close()
+‘’‘
