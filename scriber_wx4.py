@@ -5,9 +5,12 @@ import urllib2
 import re
 import time
 import random
+import chardet
 
-result3=''#保存规则不能匹配的URL，全局变量需要在不同函数中被调用
+result3 = ''#保存规则不能匹配的URL，全局变量需要在不同函数中被调用
+list_failed_url = []
 web_get = '' #全局变量，获取网页源代码
+the_first_round = True
 
 class MyFrame(wx.Frame):
     def __init__(self):
@@ -16,13 +19,15 @@ class MyFrame(wx.Frame):
 
         panel = wx.Panel(self)
         label_url = wx.StaticText(panel,-1,'URL:',pos = (10,40),size = (30,27))
-        self.text_url = wx.TextCtrl(panel,-1,pos = (50,37),size = (550,27))
+        self.text_url = wx.TextCtrl(panel,-1,pos = (50,37),size = (510,27))
 
-        label_page = wx.StaticText(panel,-1,u'翻页:',pos = (620,40),size = (30,27))
-        self.text_page = wx.TextCtrl(panel,-1,pos = (650,37),size = (30,27))
+        label_page = wx.StaticText(panel,-1,u'翻页:',pos = (570,40),size = (30,27))
+        self.text_page = wx.TextCtrl(panel,-1,pos = (600,37),size = (30,27))
 
-        label_delay = wx.StaticText(panel,-1,u'延迟:',pos = (690,40),size = (30,27))
-        self.text_delay = wx.TextCtrl(panel,-1,pos = (720,37),size = (30,27))
+        label_delay = wx.StaticText(panel,-1,u'延迟:',pos = (640,40),size = (30,27))
+        self.text_delay = wx.TextCtrl(panel,-1,pos = (670,37),size = (35,27))
+        label_delay_end = wx.StaticText(panel,-1,'-:',pos = (700,40),size = (15,27))
+        self.text_delay_end = wx.TextCtrl(panel,-1,pos = (715,37),size = (35,27))
         
         label_reg = wx.StaticText(panel,-1,'REG1:',pos = (10,100),size = (35,27))
         self.text_reg = wx.TextCtrl(panel,-1,pos = (50,95),size = (300,27))
@@ -126,9 +131,18 @@ class MyFrame(wx.Frame):
                 print item
                 result_list.append(item)
         else:
+            print 'no'
             global result3
-            result3 += url + '\n'
-            result_list.append(' ')#匹配不上空格补位
+            global the_first_round
+            if the_first_round:
+                list_failed_url.append(url)
+                result_list.append('')#匹配不上空格补位
+                print url
+            else:
+                
+                result3 += url + '\n'
+                result_list.append('')#匹配不上空格补位
+                print url
 
     def OnButtonClick_ok(self,event):
         #添加动态字段、正则于列表list_field和list_reg
@@ -137,6 +151,8 @@ class MyFrame(wx.Frame):
         num_field = self.listbox_field.GetCount()
         dict_fields = {}
         result_save = ''#创建用于保存结果的字符串
+        temp = True
+        temp_count = 0
         print num_field
         if len(list_field) < num_field:
             for i in range(0,num_field):
@@ -146,25 +162,78 @@ class MyFrame(wx.Frame):
         print len(list_field),'&&&'
         
         print 'the button_ok is clicked'
-        print self.text_url.GetValue(),self.text_reg.GetValue(),self.text_save.GetValue(),self.text_page.GetValue(),self.text_delay.GetValue()#self.choice.GetStringSelection(),
+        print self.text_url.GetValue(),self.text_reg.GetValue(),self.text_reg_page.GetValue(),self.text_save.GetValue(),self.text_page.GetValue(),self.text_delay.GetValue(),self.text_delay_end.GetValue()#self.choice.GetStringSelection(),
         pattern_str = self.text_reg.GetValue()
+        pattern_str_next = self.text_reg_page.GetValue().encode('gb2312')
         #num = int(self.choice.GetStringSelection())
         page = int(self.text_page.GetValue())
         url = str(self.text_url.GetValue())
         path = self.text_save.GetValue()
-            
-        for i in range(0,page):
-            print i
-            url='http://club.autohome.com.cn/bbs/forum-c-266-%d.html?qaType=-1#pvareaid=101061'%i
+
+        print u'第一轮'
+
+        #下载网页源码之后，暂停一段时间
+        self.get_content(self.text_url.GetValue())
+        time.sleep(int(self.text_delay.GetValue()))
+        '''
+        #判断网页编码方式,统一化正则表达式编码方式
+        if chardet.detect(web_get) == 'GB2312':
+            pattern_str_next = pattern_str_next.encode('gb2312')
+            pattern_str = pattern_str.encode('gb2312')
+         '''   
+        while temp:
             temp_list = []
-            self.get_content(url)
-            self.get_regular(pattern_str,temp_list,url)
-    
-            for item in temp_list:
-                self.get_content('http://club.autohome.com.cn/'+item)
-                for i in range(0,num_field):
-                    self.get_regular(list_reg[i],dict_fields[list_field[i]],item)
-                time.sleep(random.randint(0,int(self.text_delay.GetValue())))
+            if temp_count < page:
+                if temp_count == 0:
+                    self.get_regular(pattern_str,temp_list,self.text_url.GetValue())
+                else:
+                    self.get_regular(pattern_str,temp_list,url_next)
+                    
+                if re.findall(pattern_str_next,web_get):
+                    url_next = ''
+                    print 'next found'
+                    temp_count = temp_count +1
+                    print temp_count
+                    url_temp = re.findall(pattern_str_next,web_get)[0]
+                    url_next = 'http://club.autohome.com.cn/'+url_temp
+
+                    for item in range(0,len(temp_list)):
+                        print 'http://club.autohome.com.cn'+temp_list[item]
+                        self.get_content('http://club.autohome.com.cn'+temp_list[item])
+                        time.sleep(random.randint(int(self.text_delay.GetValue()),int(self.text_delay_end.GetValue())))
+                        for i in range(0,num_field):
+                            self.get_regular(list_reg[i],dict_fields[list_field[i]],'http://club.autohome.com.cn'+temp_list[item])
+                        #time.sleep(random.randint(0,int(self.text_delay.GetValue())))
+                        time.sleep(random.randint(int(self.text_delay.GetValue()),int(self.text_delay_end.GetValue())))
+                        
+                    #下载网页源码前后，暂停一段时间
+                    self.get_content(url_next)
+                    time.sleep(random.randint(int(self.text_delay.GetValue()),int(self.text_delay_end.GetValue())))
+                else:
+                    print 'no next'
+                    temp = False
+            else:
+                print 'large than page'
+                temp = False
+                                
+        #处理下载失败的URL
+        global the_first_round
+        the_first_round = False
+
+        print u'第二轮'
+        time.sleep(20)
+        global list_failed_url
+        list_failed_url1 = list(set(list_failed_url))
+        for item in list_failed_url1:
+            self.get_content(item)
+            time.sleep(random.randint(int(self.text_delay.GetValue()),int(self.text_delay_end.GetValue())))
+            for i in range(0,num_field):
+                self.get_regular(list_reg[i],dict_fields[list_field[i]],item)
+            #time.sleep(random.randint(0,int(self.text_delay.GetValue())))
+            
+
+            
+        #保存结果到文件
         for i in range(0,len(dict_fields[list_field[0]])):
             for j in range(0,num_field):
                 result_save += dict_fields[list_field[j]][i] + ' '
@@ -173,7 +242,7 @@ class MyFrame(wx.Frame):
         f.write(result_save)
         f.close()
         
-        if result3 !=' ':
+        if len(result3) != 0 :
             path1 = self.text_save.GetValue()[0:self.text_save.GetValue().rfind('\\')]+'/auto_failed1.txt'
             f = file(path1,'w')
             f.write(result3)
