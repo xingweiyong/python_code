@@ -116,15 +116,14 @@ class MyFrame(wx.Frame):
 
     #定义获取链接内容函数
     def get_content(self,url):#参数为网页链接
-        try:
-            my_headers={'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0',
-             'Accept':'image/png,image/*;q=0.8,*/*;q=0.5',
-             'Accept-Language':'zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3',
-             'Connection':'keep-alive'}
-            request = urllib2.Request(url,headers = my_headers)
-            response = urllib2.urlopen(request)
-            global web_get
-            web_get = response.read()
+        my_headers={'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0',
+         'Accept':'image/png,image/*;q=0.8,*/*;q=0.5',
+         'Accept-Language':'zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3',
+         'Connection':'keep-alive'}
+        request = urllib2.Request(url,headers = my_headers)
+        response = urllib2.urlopen(request)
+        global web_get
+        web_get = response.read()
         
     #获取正则匹配函数
     def get_regular(self,pattern_str,result_list,url):#存放提取内容的列表、正则表达式、当前执行的url
