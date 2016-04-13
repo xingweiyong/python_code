@@ -116,11 +116,13 @@ class MyFrame(wx.Frame):
          'Accept':'image/png,image/*;q=0.8,*/*;q=0.5',
          'Accept-Language':'zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3',
          'Connection':'keep-alive'}
-        request = urllib2.Request(url,headers = my_headers)
-        response = urllib2.urlopen(request)
-        global web_get
-        web_get = response.read()
-        
+        try:
+            request = urllib2.Request(url,headers = my_headers)
+            response = urllib2.urlopen(request)
+            global web_get
+            web_get = response.read()
+        except:
+            print 'url error'
     #获取正则匹配函数
     def get_regular(self,pattern_str,result_list,url):#存放提取内容的列表、正则表达式、当前执行的url
         pattern = re.compile(pattern_str)
@@ -195,15 +197,15 @@ class MyFrame(wx.Frame):
                     temp_count = temp_count +1
                     print temp_count
                     url_temp = re.findall(pattern_str_next,web_get)[0]
-                    url_next = 'http://club.autohome.com.cn/'+url_temp
+                    url_next = 'http://club.autohome.com.cn/' + url_temp
 
                     for item in range(0,len(temp_list)):
-                        print 'http://club.autohome.com.cn'+temp_list[item][1] + '.html'
-                        self.get_content(temp_list[item][1] + '.html')
+                        print 'http://club.autohome.com.cn'+temp_list[item]
+                        self.get_content('http://club.autohome.com.cn' + temp_list[item])
                         #self.get_content('http://club.autohome.com.cn'+temp_list[item])
                         time.sleep(random.randint(int(self.text_delay.GetValue()),int(self.text_delay_end.GetValue())))
                         for i in range(0,num_field):
-                            self.get_regular(list_reg[i],dict_fields[list_field[i]],temp_list[item])
+                            self.get_regular(list_reg[i],dict_fields[list_field[i]],'http://club.autohome.com.cn' + temp_list[item])
                         #time.sleep(random.randint(0,int(self.text_delay.GetValue())))
                         time.sleep(random.randint(int(self.text_delay.GetValue()),int(self.text_delay_end.GetValue())))
                         
